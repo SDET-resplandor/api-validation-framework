@@ -1,59 +1,65 @@
+import logging
 from fastapi import FastAPI, HTTPException, Query
 from src.sql_conect import NorthwindDatabase
 
-# Inicialización de la app FastAPI
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("northwind_api")
+
 app = FastAPI(
     title="Northwind Data API",
-    description="API REST profesional para consulta segura de datos en la base Northwind.",
+    description="REST API for querying the Northwind database.",
     version="1.0.0",
 )
 
-# Instancia global del repositorio de base de datos
 db = NorthwindDatabase()
 
 
 @app.get("/", tags=["Health"])
 def health_check() -> dict:
-    """Endpoint de salud para verificar que el servicio esté online."""
-    return {"status": "ok", "message": "API Northwind activa y lista."}
+    """Simple check to confirm the service is up and running."""
+    return {"status": "ok", "message": "Northwind API is running."}
 
 
 @app.get("/api/v1/table/{table_name}", tags=["Data Access"])
 def read_table_data(
     table_name: str,
-    limit: int = Query(default=10, ge=1, le=100, description="Límite de registros a retornar (1-100)")
+    limit: int = Query(default=10, ge=1, le=100, description="Max number of rows to return (1-100)")
 ) -> list[dict]:
     """
-    Obtiene registros de una tabla específica con límite de resultados.
-    
-    - **table_name**: Nombre exacto de la tabla.
-    - **limit**: Número de filas a consultar (por defecto 10, máximo 100).
+    Returns rows from the given table, capped by the limit parameter.
+
+    - **table_name**: exact table name.
+    - **limit**: how many rows to fetch (default 10, max 100).
     """
     try:
-        data = db.get_table_data(table_name=table_name, limit=limit)
-        return data
+        return db.get_table_data(table_name=table_name, limit=limit)
     except ValueError as val_err:
-        # Error de validación (por ejemplo, nombre de tabla no válido)
+        
         raise HTTPException(status_code=400, detail=str(val_err))
     except RuntimeError as run_err:
-        # Error interno en la consulta SQL
-        raise HTTPException(status_code=500, detail=str(run_err))
+        
+        logger.error(f"Database error on table '{table_name}': {run_err}", exc_info=True)
+        
+        raise HTTPException(status_code=500, detail="Internal server error.")
 
 
 @app.get("/api/v1/customers/{customer_id}", tags=["Customers"])
 def read_customer_by_id(customer_id: str) -> dict:
     """
-    Busca un cliente específico por su ID único.
-    
-    - **customer_id**: Identificador del cliente (ejemplo: 'ALFKI').
+    Looks up a single customer by ID.
+
+    - **customer_id**: e.g. 'ALFKI'.
     """
     try:
         customer = db.get_customer_by_id(customer_id=customer_id)
         if not customer:
             raise HTTPException(
-                status_code=404, 
-                detail=f"Cliente con ID '{customer_id}' no encontrado."
+                status_code=404,
+                detail=f"Customer with ID '{customer_id}' not found."
             )
         return customer
     except RuntimeError as run_err:
-        raise HTTPException(status_code=500, detail=str(run_err))
+       
+        logger.error(f"Database error on customer lookup '{customer_id}': {run_err}", exc_info=True)
+        
+        raise HTTPException(status_code=500, detail="Internal server error.")

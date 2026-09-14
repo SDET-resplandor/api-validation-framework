@@ -1,17 +1,17 @@
 from fastapi.testclient import TestClient
 from src.main import app
 
-# Inicializamos el cliente de pruebas para nuestra app de FastAPI
+# Test client for our FastAPI app
 client = TestClient(app)
 
 def test_read_root():
-    """Valida que el endpoint principal responda correctamente (Health Check)."""
+    """Checks that the root endpoint responds correctly (Health Check)."""
     response = client.get("/")
     assert response.status_code == 200
-    assert response.json() == {"status": "ok", "message": "API Northwind activa y lista."}
+    assert response.json() == {"status": "ok", "message": "Northwind API is running."}
 
 def test_read_table_success():
-    """Valida que se puedan consultar registros de una tabla existente (ej. Customers)."""
+    """Checks that records can be fetched from an existing table (e.g. Customers)."""
     response = client.get("/api/v1/table/Customers?limit=2")
     assert response.status_code == 200
     data = response.json()
@@ -19,7 +19,7 @@ def test_read_table_success():
     assert len(data) <= 2
 
 def test_read_customer_not_found():
-    """Valida que la API devuelva un error 404 si el cliente no existe."""
-    response = client.get("/api/v1/customers/CLIENTE_FALSO_123")
+    """Checks that the API returns a 404 error when the customer doesn't exist."""
+    response = client.get("/api/v1/customers/FAKE_CUSTOMER_123")
     assert response.status_code == 404
-    assert "no encontrado" in response.json()["detail"]
+    assert "not found" in response.json()["detail"]
