@@ -1,5 +1,6 @@
 import logging
-from fastapi import FastAPI, HTTPException, Query
+from typing import Generator
+from fastapi import Depends, FastAPI, HTTPException, Query
 from src.sql_conect import NorthwindDatabase
 
 logging.basicConfig(level=logging.INFO)
@@ -11,8 +12,16 @@ app = FastAPI(
     version="1.0.0",
 )
 
-db = NorthwindDatabase()
-
+def get_db() -> Generator[NorthwindDatabase, None, None]:
+    """Dependency provider for database instance (enables easy test mocking)."""
+    try:
+        db = NorthwindDatabase()
+        yield db
+    except FileNotFoundError as fnf_err:
+        logger.error(f"Database initialization failed: {fnf_err}")
+        raise HTTPException(
+            status_code=500, detail="Database resource unavailable."
+        )
 
 @app.get("/", tags=["Health"])
 def health_check() -> dict:
@@ -23,43 +32,43 @@ def health_check() -> dict:
 @app.get("/api/v1/table/{table_name}", tags=["Data Access"])
 def read_table_data(
     table_name: str,
-    limit: int = Query(default=10, ge=1, le=100, description="Max number of rows to return (1-100)")
+    limit: int = Query(
+        default=10,
+        ge=1,
+        le=100,
+        description="Max number of rows to return (1-100)",
+    ),
+    db: NorthwindDatabase = Depends(get_db),
 ) -> list[dict]:
-    """
-    Returns rows from the given table, capped by the limit parameter.
-
-    - **table_name**: exact table name.
-    - **limit**: how many rows to fetch (default 10, max 100).
-    """
+    """Returns rows from an allowed table, capped by the limit parameter."""
     try:
         return db.get_table_data(table_name=table_name, limit=limit)
     except ValueError as val_err:
-        
         raise HTTPException(status_code=400, detail=str(val_err))
     except RuntimeError as run_err:
-        
-        logger.error(f"Database error on table '{table_name}': {run_err}", exc_info=True)
-        
+        logger.error(
+            f"Database error on table '{table_name}': {run_err}", exc_info=True
+        )
         raise HTTPException(status_code=500, detail="Internal server error.")
 
-
-@app.get("/api/v1/customers/{customer_id}", tags=["Customers"])
-def read_customer_by_id(customer_id: str) -> dict:
-    """
-    Looks up a single customer by ID.
-
-    - **customer_id**: e.g. 'ALFKI'.
-    """
+@app.get("/api/v1/products/{product_id}", tags=["Products"])
+def read_product_by_id(
+    product_id: str,
+    db: NorthwindDatabase = Depends(get_db),
+) -> dict:
+    """Looks up a single product by ID."""
+    clean_id = product_id.strip()
     try:
-        customer = db.get_customer_by_id(customer_id=customer_id)
-        if not customer:
+        product = db.get_product_by_id(products_id=clean_id)
+        if not product:
             raise HTTPException(
                 status_code=404,
-                detail=f"Customer with ID '{customer_id}' not found."
+                detail=f"Product with ID '{clean_id}' not found.",
             )
-        return customer
+        return product
     except RuntimeError as run_err:
-       
-        logger.error(f"Database error on customer lookup '{customer_id}': {run_err}", exc_info=True)
-        
+        logger.error(
+            f"Database error on product lookup '{clean_id}': {run_err}",
+            exc_info=True,
+        )
         raise HTTPException(status_code=500, detail="Internal server error.")
