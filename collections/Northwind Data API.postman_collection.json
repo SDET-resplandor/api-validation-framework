@@ -1,359 +1,457 @@
 {
   "info": {
-    "_postman_id": "34c695dd-712c-41e4-b83c-ef4bd4731d92",
+    "_postman_id": "e64dcab8-c6a1-4440-90f8-b73583ef1d42",
     "name": "Northwind Data API",
-    "description": "API REST profesional para consulta segura de datos en la base Northwind.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "58103897"
+    "_exporter_id": "58103897",
+    "_collection_link": "https://go.postman.co/collection/58103897-e64dcab8-c6a1-4440-90f8-b73583ef1d42?source=collection_link"
   },
   "item": [
     {
-      "name": "/",
-      "item": [
+      "name": "01 - health status",
+      "event": [
         {
-          "name": "Health Check",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
             ],
-            "url": {
-              "raw": "{{baseUrl}}/",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                ""
-              ]
-            },
-            "description": "Endpoint de salud para verificar que el servicio esté online."
-          },
-          "response": [
-            {
-              "name": "Successful Response",
-              "originalRequest": {
-                "method": "GET",
-                "header": [
-                  {
-                    "key": "Accept",
-                    "value": "application/json"
-                  }
-                ],
-                "url": {
-                  "raw": "{{baseUrl}}/",
-                  "host": [
-                    "{{baseUrl}}"
-                  ],
-                  "path": [
-                    ""
-                  ]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "json",
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json"
-                }
-              ],
-              "cookie": [],
-              "body": "{\n  \"key_0\": true,\n  \"key_1\": 988.2139970328208\n}"
-            }
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"The API message is correct.\", function () {\r",
+              "    const json = pm.response.json();\r",
+              "    pm.expect(json.status).to.eql(\"ok\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            ""
           ]
         }
-      ]
+      },
+      "response": []
     },
     {
-      "name": "api",
-      "item": [
+      "name": "02-Get Products",
+      "event": [
         {
-          "name": "v1",
-          "item": [
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Response is an array of products\", function () {\r",
+              "    const data = pm.response.json();\r",
+              "    pm.expect(data).to.be.an(\"array\");\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Products list is not empty\", function () {\r",
+              "    const data = pm.response.json();\r",
+              "    pm.expect(data.length).to.be.above(0);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/products?limit=5",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "products"
+          ],
+          "query": [
             {
-              "name": "table",
-              "item": [
-                {
-                  "name": "{table_name}",
-                  "item": [
-                    {
-                      "name": "Read Table Data",
-                      "request": {
-                        "method": "GET",
-                        "header": [
-                          {
-                            "key": "Accept",
-                            "value": "application/json"
-                          }
-                        ],
-                        "url": {
-                          "raw": "{{baseUrl}}/api/v1/table/:table_name?limit=10",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "api",
-                            "v1",
-                            "table",
-                            ":table_name"
-                          ],
-                          "query": [
-                            {
-                              "key": "limit",
-                              "value": "10",
-                              "description": "Límite de registros a retornar (1-100)"
-                            }
-                          ],
-                          "variable": [
-                            {
-                              "key": "table_name",
-                              "value": "string"
-                            }
-                          ]
-                        },
-                        "description": "Obtiene registros de una tabla específica con límite de resultados.\n\n- **table_name**: Nombre exacto de la tabla.\n- **limit**: Número de filas a consultar (por defecto 10, máximo 100)."
-                      },
-                      "response": [
-                        {
-                          "name": "Successful Response",
-                          "originalRequest": {
-                            "method": "GET",
-                            "header": [
-                              {
-                                "key": "Accept",
-                                "value": "application/json"
-                              }
-                            ],
-                            "url": {
-                              "raw": "{{baseUrl}}/api/v1/table/:table_name?limit=10",
-                              "host": [
-                                "{{baseUrl}}"
-                              ],
-                              "path": [
-                                "api",
-                                "v1",
-                                "table",
-                                ":table_name"
-                              ],
-                              "query": [
-                                {
-                                  "description": "Límite de registros a retornar (1-100)",
-                                  "key": "limit",
-                                  "value": "10"
-                                }
-                              ],
-                              "variable": [
-                                {
-                                  "key": "table_name",
-                                  "value": "string"
-                                }
-                              ]
-                            }
-                          },
-                          "status": "OK",
-                          "code": 200,
-                          "_postman_previewlanguage": "json",
-                          "header": [
-                            {
-                              "key": "Content-Type",
-                              "value": "application/json"
-                            }
-                          ],
-                          "cookie": [],
-                          "body": "[\n  {\n    \"key_0\": 920.0696713867595,\n    \"key_1\": true\n  },\n  {\n    \"key_0\": true,\n    \"key_1\": false,\n    \"key_2\": 8300\n  }\n]"
-                        },
-                        {
-                          "name": "Validation Error",
-                          "originalRequest": {
-                            "method": "GET",
-                            "header": [
-                              {
-                                "key": "Accept",
-                                "value": "application/json"
-                              }
-                            ],
-                            "url": {
-                              "raw": "{{baseUrl}}/api/v1/table/:table_name?limit=10",
-                              "host": [
-                                "{{baseUrl}}"
-                              ],
-                              "path": [
-                                "api",
-                                "v1",
-                                "table",
-                                ":table_name"
-                              ],
-                              "query": [
-                                {
-                                  "description": "Límite de registros a retornar (1-100)",
-                                  "key": "limit",
-                                  "value": "10"
-                                }
-                              ],
-                              "variable": [
-                                {
-                                  "key": "table_name",
-                                  "value": "string"
-                                }
-                              ]
-                            }
-                          },
-                          "status": "Unprocessable Entity (WebDAV) (RFC 4918)",
-                          "code": 422,
-                          "_postman_previewlanguage": "json",
-                          "header": [
-                            {
-                              "key": "Content-Type",
-                              "value": "application/json"
-                            }
-                          ],
-                          "cookie": [],
-                          "body": "{\n  \"detail\": [\n    {\n      \"loc\": [\n        6418,\n        \"string\"\n      ],\n      \"msg\": \"string\",\n      \"type\": \"string\",\n      \"input\": \"\",\n      \"ctx\": {}\n    },\n    {\n      \"loc\": [\n        7952,\n        6842\n      ],\n      \"msg\": \"string\",\n      \"type\": \"string\",\n      \"input\": \"\",\n      \"ctx\": {}\n    }\n  ]\n}"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "name": "customers",
-              "item": [
-                {
-                  "name": "{customer_id}",
-                  "item": [
-                    {
-                      "name": "Read Customer By Id",
-                      "request": {
-                        "method": "GET",
-                        "header": [
-                          {
-                            "key": "Accept",
-                            "value": "application/json"
-                          }
-                        ],
-                        "url": {
-                          "raw": "{{baseUrl}}/api/v1/customers/:customer_id",
-                          "host": [
-                            "{{baseUrl}}"
-                          ],
-                          "path": [
-                            "api",
-                            "v1",
-                            "customers",
-                            ":customer_id"
-                          ],
-                          "variable": [
-                            {
-                              "key": "customer_id",
-                              "value": "string"
-                            }
-                          ]
-                        },
-                        "description": "Busca un cliente específico por su ID único.\n\n- **customer_id**: Identificador del cliente (ejemplo: 'ALFKI')."
-                      },
-                      "response": [
-                        {
-                          "name": "Successful Response",
-                          "originalRequest": {
-                            "method": "GET",
-                            "header": [
-                              {
-                                "key": "Accept",
-                                "value": "application/json"
-                              }
-                            ],
-                            "url": {
-                              "raw": "{{baseUrl}}/api/v1/customers/:customer_id",
-                              "host": [
-                                "{{baseUrl}}"
-                              ],
-                              "path": [
-                                "api",
-                                "v1",
-                                "customers",
-                                ":customer_id"
-                              ],
-                              "variable": [
-                                {
-                                  "key": "customer_id",
-                                  "value": "string"
-                                }
-                              ]
-                            }
-                          },
-                          "status": "OK",
-                          "code": 200,
-                          "_postman_previewlanguage": "json",
-                          "header": [
-                            {
-                              "key": "Content-Type",
-                              "value": "application/json"
-                            }
-                          ],
-                          "cookie": [],
-                          "body": "{\n  \"key_0\": 723\n}"
-                        },
-                        {
-                          "name": "Validation Error",
-                          "originalRequest": {
-                            "method": "GET",
-                            "header": [
-                              {
-                                "key": "Accept",
-                                "value": "application/json"
-                              }
-                            ],
-                            "url": {
-                              "raw": "{{baseUrl}}/api/v1/customers/:customer_id",
-                              "host": [
-                                "{{baseUrl}}"
-                              ],
-                              "path": [
-                                "api",
-                                "v1",
-                                "customers",
-                                ":customer_id"
-                              ],
-                              "variable": [
-                                {
-                                  "key": "customer_id",
-                                  "value": "string"
-                                }
-                              ]
-                            }
-                          },
-                          "status": "Unprocessable Entity (WebDAV) (RFC 4918)",
-                          "code": 422,
-                          "_postman_previewlanguage": "json",
-                          "header": [
-                            {
-                              "key": "Content-Type",
-                              "value": "application/json"
-                            }
-                          ],
-                          "cookie": [],
-                          "body": "{\n  \"detail\": [\n    {\n      \"loc\": [\n        6418,\n        \"string\"\n      ],\n      \"msg\": \"string\",\n      \"type\": \"string\",\n      \"input\": \"\",\n      \"ctx\": {}\n    },\n    {\n      \"loc\": [\n        7952,\n        6842\n      ],\n      \"msg\": \"string\",\n      \"type\": \"string\",\n      \"input\": \"\",\n      \"ctx\": {}\n    }\n  ]\n}"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
+              "key": "limit",
+              "value": "5"
             }
           ]
         }
-      ]
+      },
+      "response": []
+    },
+    {
+      "name": "03A - Get Product By ID (Success)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Product ID matches requested ID\", function () {\r",
+              "    const data = pm.response.json();\r",
+              "    pm.expect(data).to.have.property(\"ProductID\", 1);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Product has required properties\", function () {\r",
+              "    const data = pm.response.json();\r",
+              "    pm.expect(data).to.have.property(\"ProductName\");\r",
+              "    pm.expect(data).to.have.property(\"Unit\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/products/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "products",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "03B - Get Product By ID (404 Not Found)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 404 Not Found\", function () {\r",
+              "    pm.response.to.have.status(404);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Error detail message is returned\", function () {\r",
+              "    const data = pm.response.json();\r",
+              "    pm.expect(data).to.have.property(\"detail\");\r",
+              "    pm.expect(data.detail).to.include(\"not found\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/products/99999",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "products",
+            "99999"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "04A - Get Category By ID (Success)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Category ID matches requested ID\", function () {\r",
+              "    const data = pm.response.json();\r",
+              "    pm.expect(data).to.have.property(\"CategoryID\", 1);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Category has CategoryName property\", function () {\r",
+              "    const data = pm.response.json();\r",
+              "    pm.expect(data).to.have.property(\"CategoryName\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/categories/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "categories",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "04B - Get Category By ID (404 Not Found)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 404 Not Found\", function () {\r",
+              "    pm.response.to.have.status(404);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Error detail message is returned\", function () {\r",
+              "    const data = pm.response.json();\r",
+              "    pm.expect(data.detail).to.include(\"not found\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/categories/99999",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "categories",
+            "99999"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "05 - Get Suppliers",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Response is an array of suppliers\", function () {\r",
+              "    const data = pm.response.json();\r",
+              "    pm.expect(data).to.be.an(\"array\");\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Suppliers list respects limit parameter\", function () {\r",
+              "    const data = pm.response.json();\r",
+              "    pm.expect(data.length).to.be.at.most(10);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/suppliers?limit=10",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "suppliers"
+          ],
+          "query": [
+            {
+              "key": "limit",
+              "value": "10"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "06A - Get Table Data (Authorized)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200 OK\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Response is an array of table records\", function () {\r",
+              "    const data = pm.response.json();\r",
+              "    pm.expect(data).to.be.an(\"array\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{apiKey}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/table/categories?limit=5",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "table",
+            "categories"
+          ],
+          "query": [
+            {
+              "key": "limit",
+              "value": "5"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "06B - Get Table Data (Unauthorized)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 401 or 403 Unauthorized\", function () {\r",
+              "    pm.expect(pm.response.code).to.be.oneOf([401, 403]);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Error message detail is present\", function () {\r",
+              "    const data = pm.response.json();\r",
+              "    pm.expect(data).to.have.property(\"detail\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/table/categories",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "table",
+            "categories"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
     }
   ],
   "variable": [
     {
       "key": "baseUrl",
-      "value": "/"
+      "value": ""
+    },
+    {
+      "key": "apiKey",
+      "value": ""
     }
   ]
 }
