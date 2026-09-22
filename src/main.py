@@ -56,6 +56,8 @@ Requires X-API-Key: /api/v1/table/{table_name}, with optional ?id= and ?name= fi
 app.include_router(router)
 
 
+# Centralized handler for unexpected DB failures: logs the real error
+# server-side, returns a generic message to the client
 @app.exception_handler(RuntimeError)
 async def runtime_error_handler(request: Request, exc: RuntimeError) -> JSONResponse:
     logger.error(f"Unhandled database error on {request.url.path}: {exc}", exc_info=True)

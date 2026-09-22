@@ -20,6 +20,8 @@ def get_expected_api_key() -> str:
 
 def verify_api_key(api_key: str = Security(api_key_header)) -> str:
     expected_api_key = get_expected_api_key()
+    # Uses constant-time comparison to prevent timing attacks that
+    # could reveal the key character by character.
     if not api_key or not secrets.compare_digest(api_key, expected_api_key):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

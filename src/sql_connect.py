@@ -4,7 +4,9 @@ from pathlib import Path
 
 DB_PATH = Path(__file__).resolve().parents[1] / "data_file" / "Northwind.db"
 CONNECTION_TIMEOUT = 30
-
+# Maps each whitelisted table to its primary key and an optional
+# searchable name column, so the generic endpoint can filter safely
+# without hardcoding per-table logic.
 TABLE_METADATA = {
     "categories": {"pk": "CategoryID", "name_column": "CategoryName"},
     "products": {"pk": "ProductID", "name_column": "ProductName"},
@@ -69,6 +71,8 @@ class NorthwindDatabase:
 
     @staticmethod
     def _escape_like(value: str) -> str:
+        # Escapes SQL LIKE wildcards (% and _) so user input can't turn a
+        # name filter into an unintended "match everything" query.
         return value.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
 
     def get_products(self, limit: int = 10, name: str | None = None) -> list[dict]:
